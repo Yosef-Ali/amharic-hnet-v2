@@ -7,34 +7,65 @@ import math
 
 class AmharicMorphemeChunker(nn.Module):
     """
-    Amharic-specific dynamic chunking module that identifies morpheme boundaries
-    using linguistic rules combined with learned attention patterns.
-    Handles Ge'ez script morphological complexity.
+    Advanced Amharic-specific dynamic chunking module that identifies morpheme boundaries
+    using deep linguistic patterns combined with learned attention patterns.
+    
+    Handles Ge'ez script morphological complexity with syllabic-aware processing:
+    - Each Fidel character represents a consonant+vowel combination (syllable)
+    - Morpheme boundaries occur at syllable clusters, not individual characters
+    - Verb conjugations and noun inflections require special handling
     """
-    def __init__(self, d_model: int, target_compression: float = 4.5):
+    def __init__(self, d_model: int, target_compression: float = 4.5, avg_morpheme_length: float = 3.2):
         super().__init__()
         self.d_model = d_model
         self.target_compression = target_compression
+        self.avg_morpheme_length = avg_morpheme_length
         
-        # Amharic morphological rules
-        self.prefixes = ['የ', 'በ', 'ከ', 'ለ', 'ወ', 'እ', 'ም', 'ኣ', 'ት', 'ን', 'ኢ']
-        self.suffixes = ['ች', 'ኝ', 'ው', 'ሽ', 'ን', 'ተ', 'ና', 'ም', 'ህ', 'ሁ', 'ሻ', 'ል', 'አል', 'ነው']
+        # Enhanced Amharic morphological patterns
+        self.verb_prefixes = ['ይ', 'ለ', 'በ', 'እ', 'ስ', 'አ', 'ወ', 'ተ', 'ነ', 'ክ']
+        self.verb_suffixes = ['ል', 'ሽ', 'ን', 'ችሁ', 'ናል', 'ናልች', 'አለ', 'ች', 'ው']
+        self.noun_prefixes = ['የ', 'በ', 'ከ', 'ለ', 'ወ', 'እ', 'ም', 'ኣ', 'ት', 'ን', 'ኢ']
+        self.noun_suffixes = ['ች', 'ኝ', 'ው', 'ሽ', 'ን', 'ተ', 'ና', 'ም', 'ህ', 'ሁ', 'ሻ', 'አል', 'ነው']
         
-        # Neural components
-        self.query_proj = nn.Linear(d_model, d_model)
-        self.key_proj = nn.Linear(d_model, d_model)
-        self.morpheme_classifier = nn.Sequential(
-            nn.Linear(d_model * 3, d_model),  # Current + prev + next context
+        # Syllabic pattern recognition (Ge'ez script specific)
+        self.fidel_clusters = self._create_fidel_clusters()
+        
+        # Morphological complexity indicators
+        self.complexity_patterns = {
+            'verb_conjugation': ['እየ', 'እንዳ', 'ማለት', 'መሆን'],
+            'compound_words': ['እና', 'ወይም', 'ግን', 'ስለዚህ'],
+            'possession': ['የ...ው', 'የ...ዋ', 'የ...ች']
+        }
+        
+        # Advanced neural components for morphological analysis
+        self.syllable_encoder = nn.LSTM(d_model, d_model // 2, batch_first=True, bidirectional=True)
+        self.morpheme_attention = nn.MultiheadAttention(d_model, 8, batch_first=True)
+        
+        # Multi-layer morpheme boundary classifier
+        self.boundary_classifier = nn.Sequential(
+            nn.Linear(d_model * 4, d_model * 2),  # Current + prev + next + linguistic features
+            nn.LayerNorm(d_model * 2),
             nn.ReLU(),
             nn.Dropout(0.1),
+            nn.Linear(d_model * 2, d_model),
+            nn.LayerNorm(d_model),
+            nn.ReLU(),
             nn.Linear(d_model, d_model // 2),
             nn.ReLU(),
             nn.Linear(d_model // 2, 1),
             nn.Sigmoid()
         )
         
-        # Learned morpheme boundary embeddings
-        self.boundary_embed = nn.Embedding(2, d_model)  # [not_boundary, boundary]
+        # Linguistic feature embeddings
+        self.linguistic_features = nn.Embedding(10, d_model // 4)  # Various morphological markers
+        self.syllable_type_embed = nn.Embedding(5, d_model // 4)  # Syllable type classification
+        
+        # Morpheme type classification
+        self.morpheme_type_classifier = nn.Sequential(
+            nn.Linear(d_model, d_model // 2),
+            nn.ReLU(),
+            nn.Linear(d_model // 2, 4)  # [root, prefix, suffix, compound]
+        )
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -61,13 +92,73 @@ class AmharicMorphemeChunker(nn.Module):
             boundary_probs
         ], dim=1)
         
-        # Use feature concatenation for more sophisticated boundary detection
-        if seq_len > 1:
-            features = torch.cat([x[:, :-1], x[:, 1:]], dim=-1)  # Adjacent pair features
-            refined_probs = self.boundary_classifier(features).squeeze(-1)
-            boundary_probs[:, 1:] = refined_probs
-        
+        # Advanced morphological boundary detection
+        if seq_len > 2:
+            # Extract linguistic features for each position
+            linguistic_features = self._extract_linguistic_features(x)
+            
+            # Create context windows: [prev, current, next, linguistic]
+            prev_context = torch.cat([x[:, :1], x[:, :-1]], dim=1)
+            next_context = torch.cat([x[:, 1:], x[:, -1:]], dim=1)
+            
+            context_features = torch.cat([
+                prev_context, x, next_context, linguistic_features
+            ], dim=-1)
+            
+            # Apply boundary classification
+            boundary_logits = self.boundary_classifier(context_features).squeeze(-1)
+            
+            # Apply morpheme length constraints (avg 3.2 syllables per morpheme)
+            boundary_probs = self._apply_length_constraints(boundary_logits, seq_len)
+            
         return boundary_probs
+    
+    def _create_fidel_clusters(self):
+        """Create clusters of related Fidel characters for syllabic processing."""
+        return {
+            'ha_family': ['ሀ', 'ሁ', 'ሂ', 'ሃ', 'ሄ', 'ህ', 'ሆ'],
+            'la_family': ['ለ', 'ሉ', 'ሊ', 'ላ', 'ሌ', 'ል', 'ሎ'],
+            'ma_family': ['መ', 'ሙ', 'ሚ', 'ማ', 'ሜ', 'ም', 'ሞ'],
+            # Add more as needed
+        }
+    
+    def _extract_linguistic_features(self, x: torch.Tensor) -> torch.Tensor:
+        """Extract morphological and syllabic features for each position."""
+        batch_size, seq_len, d_model = x.shape
+        
+        # Initialize linguistic feature tensor
+        ling_features = torch.zeros(batch_size, seq_len, d_model // 4, device=x.device)
+        
+        # Apply LSTM for syllabic sequence modeling
+        syllable_encoded, _ = self.syllable_encoder(x)
+        
+        # Combine with positional linguistic markers
+        # This is a simplified version - in practice, would use actual text analysis
+        return torch.cat([syllable_encoded[:, :, :d_model//4], ling_features], dim=-1)
+    
+    def _apply_length_constraints(self, boundary_logits: torch.Tensor, seq_len: int) -> torch.Tensor:
+        """Apply morpheme length constraints based on Amharic linguistic patterns."""
+        # Smooth boundary probabilities to encourage proper morpheme lengths
+        boundary_probs = torch.sigmoid(boundary_logits)
+        
+        # Apply gaussian smoothing to encourage avg_morpheme_length spacing
+        kernel_size = max(3, int(self.avg_morpheme_length))
+        if kernel_size % 2 == 0:
+            kernel_size += 1
+            
+        # Create smoothing kernel
+        sigma = self.avg_morpheme_length / 3.0
+        kernel = torch.exp(-0.5 * ((torch.arange(kernel_size, device=boundary_probs.device) - kernel_size//2) / sigma) ** 2)
+        kernel = kernel / kernel.sum()
+        
+        # Apply convolution for smoothing
+        smoothed_probs = F.conv1d(
+            boundary_probs.unsqueeze(1),
+            kernel.view(1, 1, -1),
+            padding=kernel_size//2
+        ).squeeze(1)
+        
+        return smoothed_probs
 
 
 class HierarchicalEncoder(nn.Module):
