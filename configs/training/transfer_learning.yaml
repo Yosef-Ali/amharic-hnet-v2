@@ -1,0 +1,169 @@
+# Transfer learning configuration for Amharic H-Net v2
+experiment:
+  name: "amharic-hnet-transfer"
+  description: "Transfer learning from pre-trained model to Amharic H-Net v2"
+  tags: ["amharic", "hnet", "transfer-learning", "fine-tuning"]
+  project_name: "amharic-hnet-v2"
+
+model:
+  type: "hnet_amharic"
+  
+  # Model architecture (should match pre-trained model)
+  hidden_size: 768
+  num_layers: 12
+  num_heads: 12
+  intermediate_size: 3072
+  vocab_size: 32000
+  max_position_embeddings: 512
+  dropout_prob: 0.1
+  layer_norm_eps: 1e-12
+  
+  # Transfer learning settings
+  pretrained_model_path: "outputs/pretrained/amharic_base_model.pt"
+  freeze_embeddings: false
+  freeze_encoder_layers: 0  # Number of encoder layers to freeze
+  
+  # Model adaptation
+  adapt_vocab: true
+  vocab_adaptation_method: "extend"  # extend, replace, or merge
+
+training:
+  # Transfer learning parameters
+  num_epochs: 5  # Fewer epochs for fine-tuning
+  batch_size: 16
+  gradient_accumulation_steps: 2
+  learning_rate: 2e-5  # Lower learning rate for fine-tuning
+  weight_decay: 0.01
+  warmup_steps: 500  # Fewer warmup steps
+  max_grad_norm: 0.5  # Lower gradient clipping
+  
+  # Learning rate scheduling
+  optimizer: "adamw"  
+  scheduler: "linear_warmup"
+  
+  # Differential learning rates
+  use_differential_lr: true
+  encoder_lr_multiplier: 0.1  # Lower LR for pre-trained layers
+  classifier_lr_multiplier: 1.0  # Full LR for new layers
+  
+  # Mixed precision
+  use_fp16: true
+  fp16_opt_level: "O1"
+  
+  # Early stopping
+  early_stopping: true
+  patience: 3
+  min_delta: 0.001
+
+data:
+  # Data processing for transfer learning
+  max_length: 512
+  morpheme_masking_prob: 0.15
+  whole_word_masking: true
+  
+  # Domain adaptation data
+  train_file: "data/processed/transfer_train.jsonl"
+  val_file: "data/processed/transfer_val.jsonl"
+  vocab_file: "data/processed/vocab_adapted.txt"
+  
+  # Source domain data (optional for continued pre-training)
+  source_train_file: "data/processed/source_train.jsonl"
+  mix_source_target_ratio: 0.3  # 30% source data, 70% target data
+  
+  # Data loading
+  num_workers: 4
+  pin_memory: true
+  drop_last: false  # Keep all data for fine-tuning
+
+logging:
+  # Experiment tracking
+  use_wandb: true
+  use_tensorboard: true
+  
+  # Logging frequency
+  log_steps: 50
+  eval_steps: 200
+  save_steps: 500
+  
+  # Output directories
+  output_dir: "./outputs/transfer_learning"
+  logging_dir: "./outputs/transfer_learning/logs"
+  tensorboard_dir: "./outputs/tensorboard/transfer_learning"
+
+evaluation:
+  # Evaluation settings
+  eval_batch_size: 32
+  eval_accumulation_steps: 1
+  
+  # Metrics to compute
+  compute_perplexity: true
+  compute_morpheme_accuracy: true
+  compute_bleu: true
+  compute_transfer_effectiveness: true
+  
+  # Domain-specific evaluation
+  eval_on_source_domain: true
+  eval_on_target_domain: true
+  
+  # Text generation for evaluation
+  generate_samples: true
+  num_samples: 15
+  max_generation_length: 150
+
+transfer_learning:
+  # Transfer learning specific settings
+  
+  # Layer-wise learning rate decay
+  layerwise_lr_decay: 0.9
+  
+  # Progressive unfreezing
+  progressive_unfreezing: false
+  unfreeze_schedule: [2, 1, 0]  # Unfreeze layers at these epochs
+  
+  # Task-specific heads
+  add_task_specific_heads: false
+  task_heads:
+    - name: "morpheme_tagging"
+      num_classes: 50
+    - name: "pos_tagging" 
+      num_classes: 17
+  
+  # Regularization for transfer learning
+  dropout_increase: 0.05  # Increase dropout for regularization
+  l2_regularization: 1e-4
+  
+  # Knowledge distillation (optional)
+  use_knowledge_distillation: false
+  teacher_model_path: null
+  distillation_alpha: 0.5
+  distillation_temperature: 4.0
+
+validation:
+  # Validation strategy for transfer learning
+  validation_strategy: "steps"
+  validation_steps: 200
+  
+  # Cross-validation (if applicable)
+  use_cross_validation: false
+  cv_folds: 5
+  
+  # Domain adaptation validation
+  validate_on_multiple_domains: true
+  domain_files:
+    - "data/processed/news_val.jsonl"
+    - "data/processed/literature_val.jsonl"
+    - "data/processed/social_val.jsonl"
+
+hardware:
+  # Device settings
+  device: "auto"
+  gpu_ids: [0]
+  distributed: false
+  
+  # Memory optimization
+  gradient_checkpointing: false
+  dataloader_pin_memory: true
+  
+  # Model loading optimization
+  low_cpu_mem_usage: true
+  torch_dtype: "float16"

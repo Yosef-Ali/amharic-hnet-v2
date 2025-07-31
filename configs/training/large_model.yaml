@@ -1,0 +1,139 @@
+# Large model training configuration for Amharic H-Net v2
+experiment:
+  name: "amharic-hnet-large"
+  description: "Large model training configuration for Amharic H-Net v2"
+  tags: ["amharic", "hnet", "large", "morphology", "high-capacity"]
+  project_name: "amharic-hnet-v2"
+
+model:
+  type: "hnet_amharic"
+  hidden_size: 1024
+  num_layers: 24
+  num_heads: 16
+  intermediate_size: 4096
+  vocab_size: 50000
+  max_position_embeddings: 1024
+  dropout_prob: 0.1
+  layer_norm_eps: 1e-12
+  
+  # Large model specific settings
+  use_mamba_blocks: true
+  mamba_d_state: 16
+  mamba_d_conv: 4
+
+training:
+  # Training parameters
+  num_epochs: 20
+  batch_size: 4  # Smaller batch size for large model
+  gradient_accumulation_steps: 8  # Compensate with more accumulation
+  learning_rate: 2e-5  # Lower learning rate for stability
+  weight_decay: 0.01
+  warmup_steps: 2000  # More warmup steps
+  max_grad_norm: 1.0
+  
+  # Optimization
+  optimizer: "adamw"
+  scheduler: "cosine_with_restarts"
+  scheduler_kwargs:
+    T_0: 5000
+    T_mult: 2
+    eta_min: 1e-7
+  
+  # Mixed precision (essential for large models)
+  use_fp16: true
+  fp16_opt_level: "O2"
+  
+  # Advanced training techniques
+  gradient_checkpointing: true
+  use_deepspeed: false  # Enable if using DeepSpeed
+
+data:
+  # Data processing
+  max_length: 1024  # Longer sequences for large model
+  morpheme_masking_prob: 0.15
+  whole_word_masking: true
+  dynamic_padding: true
+  
+  # Advanced masking strategies
+  span_masking: true
+  span_length: 3
+  span_probability: 0.2
+  
+  # Data paths
+  train_file: "data/processed/train_large.jsonl"
+  val_file: "data/processed/val_large.jsonl"
+  vocab_file: "data/processed/vocab_large.txt"
+  
+  # Data loading
+  num_workers: 8
+  pin_memory: true
+  drop_last: true
+  prefetch_factor: 4
+
+logging:
+  # Experiment tracking
+  use_wandb: true
+  use_tensorboard: true
+  
+  # Logging frequency (less frequent for large model)
+  log_steps: 50
+  eval_steps: 1000
+  save_steps: 2000
+  
+  # Output directories
+  output_dir: "./outputs/large_training"
+  logging_dir: "./outputs/large_training/logs"
+  tensorboard_dir: "./outputs/tensorboard/large_training"
+
+evaluation:
+  # Evaluation settings
+  eval_batch_size: 2  # Smaller batch for evaluation
+  eval_accumulation_steps: 4
+  
+  # Metrics to compute
+  compute_perplexity: true
+  compute_morpheme_accuracy: true
+  compute_bleu: true
+  compute_semantic_similarity: true
+  
+  # Text generation for evaluation
+  generate_samples: true
+  num_samples: 20
+  max_generation_length: 200
+  generation_strategies: ["greedy", "beam_search", "nucleus"]
+
+hardware:
+  # Device settings
+  device: "auto"
+  gpu_ids: [0, 1, 2, 3]  # Multi-GPU setup recommended
+  distributed: true
+  
+  # Memory optimization (critical for large models)
+  gradient_checkpointing: true
+  dataloader_pin_memory: true
+  empty_cache_steps: 100
+  
+  # Advanced hardware settings
+  use_torch_compile: false  # Enable if using PyTorch 2.0+
+  torch_compile_mode: "reduce-overhead"
+
+checkpointing:
+  # Advanced checkpointing for large models
+  save_total_limit: 3
+  save_best_only: false
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+  
+  # Checkpoint resumption
+  resume_from_checkpoint: null
+  ignore_data_skip: false
+
+optimization:
+  # Memory optimization techniques
+  use_cpu_offload: false
+  pin_memory: true
+  non_blocking: true
+  
+  # Gradient optimization
+  sync_gradients: true
+  find_unused_parameters: false
