@@ -29,18 +29,20 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict
 import json
-import subprocess
 import time
 from datetime import datetime
-import yaml
+
+try:
+    import yaml
+except ImportError:
+    print("Warning: yaml not installed. Run 'pip install pyyaml'")
+    yaml = None
 
 # Import sub-agents
 from src.data_collection.amharic_collector import AmharicDataCollector
 from src.linguistic_analysis.morphological_analyzer import AmharicMorphologicalAnalyzer
-from src.training.train import AmharicHNetTrainer
-from src.evaluation.evaluate import AmharicHNetEvaluator
 
 
 class WorkflowCoordinator:
@@ -164,7 +166,7 @@ class WorkflowCoordinator:
         self, 
         source: str = 'wikipedia', 
         max_articles: int = 1000,
-        **kwargs
+        concurrent: int = 5
     ) -> Dict:
         """Execute data collection using data-collector sub-agent."""
         self.logger.info(f"📊 Data-Collector: Collecting {max_articles} articles from {source}...")
@@ -172,7 +174,7 @@ class WorkflowCoordinator:
         # Initialize data collector
         collector = AmharicDataCollector(
             output_dir=str(self.project_root / "data" / "raw"),
-            max_concurrent=kwargs.get('concurrent', 5)
+            max_concurrent=concurrent
         )
         
         # Collect data
@@ -203,8 +205,7 @@ class WorkflowCoordinator:
     async def _execute_analysis_phase(
         self, 
         input_dir: str, 
-        output_dir: str,
-        **kwargs
+        output_dir: str
     ) -> Dict:
         """Execute linguistic analysis using linguistic-analyzer sub-agent."""
         self.logger.info(f"🔍 Linguistic-Analyzer: Processing texts from {input_dir}...")
@@ -269,17 +270,22 @@ class WorkflowCoordinator:
     async def _execute_training_phase(
         self, 
         config_path: str,
-        **kwargs
+        epochs: int = None,
+        batch_size: int = None,
+        use_transfer_learning: bool = True
     ) -> Dict:
         """Execute model training using training-engineer sub-agent."""
         self.logger.info(f"🚀 Training-Engineer: Starting model training with {config_path}...")
         
         # Load training configuration
-        with open(config_path, 'r') as f:
-            config = yaml.safe_load(f)
+        if yaml:
+            with open(config_path, 'r') as f:
+                config = yaml.safe_load(f)
+        else:
+            config = {}
         
         # Check for transfer learning
-        if kwargs.get('use_transfer_learning', True):
+        if use_transfer_learning:
             self.logger.info("🔄 Initializing transfer learning from Chinese H-Net...")
             # Would implement transfer learning initialization here
         
@@ -292,10 +298,10 @@ class WorkflowCoordinator:
         ]
         
         # Add additional arguments
-        if kwargs.get('epochs'):
-            training_cmd.extend(["--epochs", str(kwargs['epochs'])])
-        if kwargs.get('batch_size'):
-            training_cmd.extend(["--batch-size", str(kwargs['batch_size'])])
+        if epochs:
+            training_cmd.extend(["--epochs", str(epochs)])
+        if batch_size:
+            training_cmd.extend(["--batch-size", str(batch_size)])
         
         process = await asyncio.create_subprocess_exec(
             *training_cmd,
@@ -318,8 +324,7 @@ class WorkflowCoordinator:
     
     async def _execute_evaluation_phase(
         self, 
-        model_path: str,
-        **kwargs
+        model_path: str
     ) -> Dict:
         """Execute model evaluation using evaluation-specialist sub-agent."""
         self.logger.info(f"📈 Evaluation-Specialist: Evaluating model {model_path}...")
@@ -363,7 +368,8 @@ class WorkflowCoordinator:
         self, 
         model_path: str = None,
         api_port: int = 8000,
-        **kwargs
+        max_length: int = 200,
+        temperature: float = 0.8
     ) -> Dict:
         """Execute model deployment using deployment-engineer sub-agent."""
         self.logger.info(f"🌐 Deployment-Engineer: Deploying model API on port {api_port}...")
@@ -376,8 +382,8 @@ class WorkflowCoordinator:
             'model_path': model_path,
             'api_port': api_port,
             'enable_cultural_safety': True,
-            'max_generation_length': kwargs.get('max_length', 200),
-            'temperature': kwargs.get('temperature', 0.8)
+            'max_generation_length': max_length,
+            'temperature': temperature
         }
         
         config_file = self.project_root / "deployment_config.json"

@@ -2,41 +2,49 @@
 
 ## Available Specialized Agents
 
+All agents are located in `.claude/agents/` directory with detailed specifications.
+
 ### 1. **data-collector** - Amharic Corpus Collection Specialist
+- **File**: `.claude/agents/data-collector.md`
 - **Expertise**: Web scraping, data validation, corpus quality assessment
-- **Tools**: Beautiful Soup, Scrapy, data validation frameworks
-- **Tasks**: Wikipedia scraping, news corpus collection, social media data gathering
-- **Deliverables**: Clean, validated Amharic text corpora with metadata
+- **Tools**: aiohttp, BeautifulSoup, pandas, asyncio
+- **Tasks**: Wikipedia scraping, news corpus collection, cultural safety validation
+- **Deliverables**: Clean JSON corpora with metadata and quality scores
 
 ### 2. **linguistic-analyzer** - Amharic Language Expert  
+- **File**: `.claude/agents/linguistic-analyzer.md`
 - **Expertise**: Morphological analysis, dialectal variations, cultural context
-- **Tools**: Morpheme segmentation, POS tagging, cultural safety validation
-- **Tasks**: Text preprocessing, morphological annotation, dialect classification
-- **Deliverables**: Linguistically annotated datasets, morpheme boundaries
+- **Tools**: morfessor, numpy, regex, unicodedata
+- **Tasks**: Morpheme segmentation, POS tagging, dialect classification
+- **Deliverables**: Linguistically annotated datasets with confidence scores
 
 ### 3. **model-architect** - H-Net Architecture Designer
+- **File**: `.claude/agents/model-architect.md`
 - **Expertise**: Neural architecture design, transfer learning, optimization
-- **Tools**: PyTorch, model optimization, architectural patterns
-- **Tasks**: Model design, layer configuration, transfer learning setup
-- **Deliverables**: Optimized model architectures, training configurations
+- **Tools**: torch.nn, transformers, einops, onnx
+- **Tasks**: Architecture design, transfer learning strategy, optimization
+- **Deliverables**: Optimized model architectures and implementation plans
 
 ### 4. **training-engineer** - Training Pipeline Specialist
+- **File**: `.claude/agents/training-engineer.md`
 - **Expertise**: Distributed training, hyperparameter optimization, monitoring
-- **Tools**: Accelerate, Weights & Biases, TensorBoard, multi-GPU training
-- **Tasks**: Training setup, monitoring, optimization, checkpointing
-- **Deliverables**: Trained models, performance metrics, training logs
+- **Tools**: accelerate, wandb, tensorboard, docker
+- **Tasks**: Environment setup, training orchestration, performance monitoring
+- **Deliverables**: Trained models, training logs, environment validation
 
 ### 5. **evaluation-specialist** - Amharic Model Assessment Expert
-- **Expertise**: Cultural safety evaluation, morphological accuracy, human evaluation
-- **Tools**: Custom evaluation metrics, cultural safety frameworks
-- **Tasks**: Model validation, safety assessment, performance benchmarking
-- **Deliverables**: Comprehensive evaluation reports, safety certifications
+- **File**: `.claude/agents/evaluation-specialist.md`
+- **Expertise**: Cultural safety evaluation, morphological accuracy, benchmarking
+- **Tools**: sklearn, scipy, matplotlib, pandas
+- **Tasks**: Comprehensive evaluation, cultural safety audit, human evaluation
+- **Deliverables**: Evaluation reports, cultural safety certification
 
 ### 6. **deployment-engineer** - Production Deployment Expert
+- **File**: `.claude/agents/deployment-engineer.md`
 - **Expertise**: API development, cloud deployment, monitoring, scaling
-- **Tools**: FastAPI, Docker, Kubernetes, cloud platforms
-- **Tasks**: API creation, containerization, deployment, monitoring
-- **Deliverables**: Production-ready APIs, deployment infrastructure
+- **Tools**: fastapi, docker, kubernetes, prometheus
+- **Tasks**: API deployment, containerization, monitoring setup
+- **Deliverables**: Production APIs, deployment configurations, monitoring dashboards
 
 ## Agent Collaboration Workflows
 
