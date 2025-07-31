@@ -1,0 +1,187 @@
+# Amharic H-Net Configuration File
+# This configuration defines all hyperparameters and settings for training the Amharic H-Net model
+
+# Model Architecture Configuration
+model:
+  # Transformer dimensions
+  d_model: 768                    # Hidden dimension size
+  n_encoder_layers: 4             # Number of hierarchical encoder layers
+  n_decoder_layers: 4             # Number of decoder layers
+  n_main_layers: 12               # Number of main transformer layers
+  n_heads: 12                     # Number of attention heads
+  
+  # H-Net specific parameters
+  compression_ratio: 4.5          # Target compression ratio for dynamic chunking
+  vocab_size: 256                 # Byte-level vocabulary (0-255)
+  
+  # Amharic-specific parameters
+  morpheme_aware_chunking: true   # Enable morpheme-aware boundary detection
+  avg_morpheme_length: 3.2        # Average Amharic morpheme length in syllables
+  dialect_support: true           # Enable multi-dialect support
+  cultural_safety: true           # Enable cultural safety guardrails
+  
+  # Regularization
+  dropout: 0.1                    # Dropout rate
+  layer_norm_eps: 1e-5           # Layer normalization epsilon
+
+# Training Configuration
+training:
+  # Basic training parameters
+  batch_size: 16                  # Training batch size
+  num_epochs: 10                  # Number of training epochs
+  learning_rate: 1e-4             # Base learning rate
+  warmup_steps: 1000              # Number of warmup steps
+  
+  # Optimization
+  weight_decay: 0.01              # Weight decay for regularization
+  max_grad_norm: 1.0              # Gradient clipping threshold
+  
+  # Loss weights
+  boundary_reg_weight: 0.1        # Weight for boundary regularization loss
+  compression_loss_weight: 0.01   # Weight for compression ratio loss
+  cultural_loss_weight: 0.1       # Weight for cultural safety loss
+  
+  # Training logistics
+  save_every: 1                   # Save checkpoint every N epochs
+  eval_every: 1                   # Evaluate every N epochs
+  log_interval: 100               # Log training metrics every N steps
+  num_workers: 4                  # Number of data loading workers
+  
+  # Mixed precision training
+  use_amp: true                   # Use automatic mixed precision
+  
+  # Early stopping
+  patience: 5                     # Early stopping patience
+  min_delta: 0.001               # Minimum improvement for early stopping
+
+# Optimizer Configuration
+optimizer:
+  type: "adamw"                   # Optimizer type (adamw, adam)
+  learning_rate: 1e-4             # Learning rate
+  weight_decay: 0.01              # Weight decay
+  betas: [0.9, 0.999]            # Adam betas
+  eps: 1e-8                      # Adam epsilon
+
+# Learning Rate Scheduler
+scheduler:
+  type: "cosine"                  # Scheduler type (cosine, onecycle, linear)
+  max_lr: 1e-3                   # Maximum learning rate (for onecycle)
+  eta_min: 1e-6                  # Minimum learning rate (for cosine)
+  pct_start: 0.1                 # Percentage of cycle for warmup (onecycle)
+
+# Data Configuration
+data:
+  # Text processing
+  max_length: 512                 # Maximum sequence length
+  min_length: 10                  # Minimum text length to include
+  min_amharic_ratio: 0.3         # Minimum ratio of Amharic characters
+  
+  # Data splits
+  train_split: 0.9               # Training data ratio
+  val_split: 0.1                 # Validation data ratio
+  
+  # Data loading
+  shuffle_buffer: 10000          # Shuffle buffer size for streaming
+  prefetch_factor: 2             # Prefetch factor for data loading
+
+# Cultural Safety Configuration
+cultural_safety:
+  # Safety checking
+  enable_runtime_checking: true   # Enable cultural safety checking during training
+  violation_threshold: 0.1       # Maximum allowed violation rate
+  
+  # Sacred terms protection
+  protect_sacred_terms: true     # Enable sacred terms protection
+  
+  # Content filtering
+  filter_inappropriate: true     # Filter inappropriate content
+  cultural_context_aware: true   # Use cultural context in safety checking
+
+# Evaluation Configuration
+evaluation:
+  # Generation parameters
+  max_generation_length: 200     # Maximum length for text generation
+  temperature: 0.8               # Sampling temperature
+  top_k: 50                     # Top-k sampling parameter
+  top_p: 0.9                    # Top-p (nucleus) sampling parameter
+  num_samples: 3                # Number of samples per prompt
+  
+  # Evaluation metrics
+  compute_perplexity: true      # Compute perplexity on test set
+  evaluate_compression: true    # Evaluate compression performance
+  check_cultural_safety: true   # Check cultural safety of generated text
+  assess_amharic_quality: true  # Assess quality of Amharic generation
+  
+  # Test prompts
+  test_prompts: [
+    "አማርኛ",
+    "ቡና",
+    "ኢትዮጵያ", 
+    "መስቀል",
+    "ባህል",
+    "ንጉሥ",
+    "ገና", 
+    "ፋሲካ",
+    "አዲስ አበባ",
+    "ሃይማኖት"
+  ]
+
+# Logging and Monitoring
+logging:
+  # Tensorboard
+  use_tensorboard: true          # Enable tensorboard logging
+  log_dir: "logs"               # Tensorboard log directory
+  
+  # Weights & Biases
+  use_wandb: false              # Enable Weights & Biases logging
+  wandb_project: "amharic-hnet" # W&B project name
+  
+  # File logging
+  log_level: "INFO"             # Logging level
+  log_file: "training.log"      # Log file name
+
+# Hardware Configuration
+hardware:
+  # Device settings
+  device: "auto"                # Device to use (auto, cuda, cpu)
+  mixed_precision: true         # Use mixed precision training
+  
+  # Memory optimization
+  gradient_checkpointing: false # Use gradient checkpointing to save memory
+  pin_memory: true             # Pin memory for faster GPU transfer
+  
+  # Multi-GPU settings
+  distributed: false           # Use distributed training
+  num_gpus: 1                 # Number of GPUs to use
+
+# Reproducibility
+reproducibility:
+  seed: 42                     # Random seed for reproducibility
+  deterministic: false         # Use deterministic algorithms (slower but reproducible)
+
+# Paths and Directories
+paths:
+  # Data paths
+  data_dir: "data/processed"    # Directory containing processed data
+  raw_data_dir: "data/raw"     # Directory containing raw data
+  
+  # Model paths
+  output_dir: "outputs"        # Output directory for checkpoints and logs
+  checkpoint_dir: "checkpoints" # Checkpoint directory
+  
+  # Evaluation paths
+  eval_output_dir: "evaluation_results" # Evaluation results directory
+
+# Advanced Settings
+advanced:
+  # Memory settings
+  max_memory_usage: 0.9        # Maximum GPU memory usage (fraction)
+  empty_cache_every: 100       # Empty GPU cache every N steps
+  
+  # Debugging
+  debug_mode: false           # Enable debug mode
+  profile_training: false     # Profile training performance
+  
+  # Experimental features
+  use_dynamic_batching: false # Use dynamic batching (experimental)
+  adaptive_compression: false # Use adaptive compression ratio (experimental)

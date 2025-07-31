@@ -1,0 +1,15 @@
+torch>=2.0.0
+transformers>=4.30.0
+mamba-ssm>=1.0.0
+numpy
+pandas
+tqdm
+einops
+datasets
+morfessor
+pyyaml
+matplotlib
+seaborn
+tensorboard
+wandb
+scikit-learn
