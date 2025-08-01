@@ -1,87 +1,61 @@
-# 🤖 Sub-Agent Workflow Guide for Amharic H-Net Development
+# 🤖 Claude Code Sub-Agent Workflow Guide for Amharic H-Net Development
 
 ## Overview
 
-This guide demonstrates how to leverage **Claude Code best practices** with specialized sub-agents for immediate action items in Amharic H-Net v2 development. Following the ERPNext/Frappe agent model from your CLAUDE.md, we've created domain-expert agents that work collaboratively.
+This guide demonstrates **Claude Code native sub-agent workflows** following official best practices. Each agent has single responsibility, limited tool access, and clear integration patterns using the Task tool for coordination.
 
 ## 🎯 **Sub-Agent Architecture**
 
 ### Available Specialized Agents
 
-1. **🗂️ data-collector** - Amharic Corpus Collection Specialist
-2. **🔍 linguistic-analyzer** - Amharic Language Expert  
-3. **🏗️ model-architect** - H-Net Architecture Designer
-4. **🚀 training-engineer** - Training Pipeline Specialist
-5. **📈 evaluation-specialist** - Model Assessment Expert
-6. **🌐 deployment-engineer** - Production Deployment Expert
+1. **🗂️ data-collector** - Single-purpose corpus collection (Tools: WebFetch, Write, Bash)
+2. **🔍 linguistic-analyzer** - Morphological analysis only (Tools: Read, Write, Bash)  
+3. **🏗️ model-architect** - Architecture design only (Tools: Write, Read, Bash)
+4. **🚀 training-engineer** - Training execution only (Tools: Bash, Read, Write)
+5. **📈 evaluation-specialist** - Model evaluation only (Tools: Bash, Read, Write)
+6. **🌐 deployment-engineer** - Deployment only (Tools: Bash, Write, Read)
 
-Each agent has specialized tools, domain expertise, and clear deliverables.
-
----
-
-## 🚀 **Immediate Action Items Implementation**
-
-### **Action Item 1: Environment Setup**
-
-**Using training-engineer sub-agent:**
-
-```bash
-# Run the automated setup
-./setup_environment.sh
-
-# Verify environment
-python validate_environment.py
-
-# Expected output:
-# 🇪🇹 Amharic H-Net v2 Environment Validation
-# ✅ Python 3.8+ detected
-# ✅ GPU available: NVIDIA RTX 4090
-# ✅ All packages installed
-# 🎉 Environment setup successful!
-```
-
-**What the training-engineer does:**
-- Creates virtual environment with all dependencies
-- Installs PyTorch, transformers, accelerate, wandb
-- Sets up directory structure for data, models, outputs
-- Configures development tools (pytest, black, flake8)
-- Validates GPU availability and configurations
+Each agent follows Claude Code best practices: single responsibility, limited tool access, clear constraints.
 
 ---
 
-### **Action Item 2: Data Collection**
+## 🚀 **Native Task Tool Workflow Implementation**
 
-**Using data-collector sub-agent:**
+### **Action Item 1: Data Collection**
 
-```bash
-# Single source collection
-python workflow_coordinator.py --phase collect --source wikipedia --max-articles 1000
+**Using Claude Code Task tool:**
 
-# Multi-source collection
-python workflow_coordinator.py --phase collect --source all --max-articles 500
-
-# Or directly use the sub-agent
-python -m src.data_collection.amharic_collector --source wikipedia --max-articles 1000 --output data/raw
+```python
+Task(
+    description="Collect corpus",
+    prompt="data-collector: Collect 500 high-quality Amharic Wikipedia articles with >70% Amharic ratio and cultural safety validation",
+    subagent_type="general-purpose"
+)
 ```
 
-**What the data-collector does:**
-- **Wikipedia**: Extracts 1000+ Amharic articles with metadata
-- **BBC Amharic**: Scrapes high-quality news content
-- **Cultural Validation**: Ensures appropriate cultural context
-- **Quality Filtering**: Min 70% Amharic ratio, proper length
-- **Dialect Detection**: Identifies Ethiopian/Eritrean variants
-- **Output**: Clean JSON corpus with linguistic annotations
+**What the data-collector delivers:**
+- High-quality corpus saved to data/raw directory
+- Cultural safety compliance report (>95% required)
+- Quality metrics and dialect coverage analysis
 
-**Expected Results:**
-```json
-{
-  "total_samples": 1000,
-  "total_words": 150000,
-  "average_quality": 0.85,
-  "dialect_coverage": ["standard", "eritrean", "gojjam"],
-  "cultural_domains": ["news", "culture", "history", "science"]
-}
+---
+
+### **Action Item 2: Linguistic Analysis**
+
+**Using Claude Code Task tool (after data collection):**
+
+```python
+Task(
+    description="Analyze morphology",
+    prompt="linguistic-analyzer: Process collected corpus from data/raw for morpheme segmentation with >85% accuracy, output to data/processed",
+    subagent_type="general-purpose"
+)
 ```
+
+**What the linguistic-analyzer delivers:**
+- Morphologically annotated training data
+- Cultural safety validation report
+- Linguistic feature extraction results
 
 ---
 
@@ -89,12 +63,11 @@ python -m src.data_collection.amharic_collector --source wikipedia --max-article
 
 **Using linguistic-analyzer sub-agent:**
 
-```bash
-# Process collected data
-python workflow_coordinator.py --phase analyze --input data/raw --output data/processed
-
-# Or directly
-python -m src.linguistic_analysis.morphological_analyzer --input data/raw --output data/processed
+```python
+# Process collected data using Claude Code Task tool
+Task(description="Analyze morphology", 
+     prompt="linguistic-analyzer: Process corpus from data/raw for morpheme segmentation with >85% accuracy", 
+     subagent_type="general-purpose")
 ```
 
 **What the linguistic-analyzer does:**
@@ -127,17 +100,14 @@ python -m src.linguistic_analysis.morphological_analyzer --input data/raw --outp
 
 **Using training-engineer sub-agent:**
 
-```bash
-# Full training pipeline with transfer learning
-python workflow_coordinator.py --phase train --config configs/config.yaml
+```python
+# Model training using Claude Code Task tool
+Task(description="Train model", 
+     prompt="training-engineer: Train H-Net using processed data with transfer learning from Chinese weights", 
+     subagent_type="general-purpose")
 
-# Or step-by-step
-python main.py train \
-  --config configs/config.yaml \
-  --data-dir data/processed \
-  --output-dir outputs \
-  --use-transfer-learning \
-  --chinese-model-path path/to/chinese_hnet.pt
+# Traditional CLI still available
+# python main.py train --config configs/config.yaml --data-dir data/processed
 ```
 
 **What the training-engineer does:**
@@ -163,12 +133,11 @@ Epoch 10/10: Loss=1.34, Morphological Acc=0.89, Cultural Safety=0.99
 
 **Using evaluation-specialist sub-agent:**
 
-```bash
-# Full evaluation suite
-python workflow_coordinator.py --phase evaluate --model outputs/checkpoint_best.pt
-
-# Custom evaluation
-python -m src.evaluation.amharic_metrics --model outputs/checkpoint_best.pt --output evaluation_results
+```python
+# Model evaluation using Claude Code Task tool
+Task(description="Evaluate model", 
+     prompt="evaluation-specialist: Assess trained model for >85% morphological accuracy and >95% cultural safety", 
+     subagent_type="general-purpose")
 ```
 
 **What the evaluation-specialist does:**
@@ -200,14 +169,16 @@ Overall Fluency Score: 0.887
 
 **Using deployment-engineer sub-agent:**
 
-```bash
-# Deploy API server
-python workflow_coordinator.py --phase deploy --model outputs/checkpoint_best.pt --port 8000
+```python
+# Production deployment using Claude Code Task tool
+Task(description="Deploy API", 
+     prompt="deployment-engineer: Deploy validated model as production API with <200ms response time and cultural safety monitoring", 
+     subagent_type="general-purpose")
 
-# Test the API
-curl -X POST "http://localhost:8000/generate" \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "ቡና የኢትዮጵያ", "max_length": 100}'
+# Test the deployed API
+# curl -X POST "http://localhost:8000/generate" \
+#   -H "Content-Type: application/json" \
+#   -d '{"prompt": "ቡና የኢትዮጵያ", "max_length": 100}'
 ```
 
 **What the deployment-engineer does:**
@@ -219,97 +190,82 @@ curl -X POST "http://localhost:8000/generate" \
 
 ---
 
-## 🔄 **Complete Workflow Execution**
+## 🔄 **Complete Claude Code Workflow**
 
-### **Full Pipeline (Automated)**
+### **Agent Chaining with Task Tool**
 
-```bash
-# Execute complete development workflow
-python workflow_coordinator.py --phase full \
-  --source wikipedia \
-  --max-articles 1000 \
-  --config configs/config.yaml \
-  --port 8000
+```python
+# Step 1: Data Collection
+Task(
+    description="Collect data",
+    prompt="data-collector: Collect 1000 Wikipedia articles with cultural validation",
+    subagent_type="general-purpose"
+)
+
+# Step 2: Linguistic Processing
+Task(
+    description="Process linguistics", 
+    prompt="linguistic-analyzer: Analyze corpus from data/raw with morphological segmentation",
+    subagent_type="general-purpose"
+)
+
+# Step 3: Architecture Design (parallel)
+Task(
+    description="Design architecture",
+    prompt="model-architect: Design optimal H-Net for Amharic morphological processing",
+    subagent_type="general-purpose"
+)
+
+# Step 4: Model Training
+Task(
+    description="Train model",
+    prompt="training-engineer: Train H-Net using processed data with transfer learning",
+    subagent_type="general-purpose"
+)
+
+# Step 5: Model Evaluation
+Task(
+    description="Evaluate model",
+    prompt="evaluation-specialist: Assess trained model for >85% accuracy and >95% cultural safety",
+    subagent_type="general-purpose"
+)
+
+# Step 6: Production Deployment
+Task(
+    description="Deploy API",
+    prompt="deployment-engineer: Deploy validated model as API with <200ms response time",
+    subagent_type="general-purpose"
+)
 ```
 
-### **Step-by-Step Execution**
+### **Native Task Tool Benefits**
 
-```bash
-# 1. Setup environment
-python workflow_coordinator.py --phase setup
+Using Claude Code's native approach provides:
 
-# 2. Collect data  
-python workflow_coordinator.py --phase collect --source wikipedia --max-articles 1000
-
-# 3. Analyze linguistics
-python workflow_coordinator.py --phase analyze --input data/raw --output data/processed
-
-# 4. Train model
-python workflow_coordinator.py --phase train --config configs/config.yaml
-
-# 5. Evaluate performance
-python workflow_coordinator.py --phase evaluate --model outputs/checkpoint_best.pt
-
-# 6. Deploy to production
-python workflow_coordinator.py --phase deploy --model outputs/checkpoint_best.pt --port 8000
-```
-
-### **Workflow Monitoring**
-
-The coordinator generates comprehensive reports:
-
-```
-🇪🇹 AMHARIC H-NET DEVELOPMENT WORKFLOW REPORT
-==========================================
-
-📊 EXECUTION SUMMARY
-   Start Time: 2025-01-31 10:00:00
-   Total Duration: 3247.82 seconds
-   Phases Completed: 6
-
-✅ PHASE: COLLECT
-   Status: completed
-   Duration: 245.32s
-   Samples: 1000
-   Words: 156,823
-   Quality: 0.847
-
-✅ PHASE: TRAIN
-   Status: completed  
-   Duration: 2856.45s
-   Final Loss: 1.34
-   Morphological Acc: 0.891
-
-🎯 SUCCESS RATE: 100.0%
-```
+- **Simplified Architecture**: No complex Python coordination infrastructure
+- **Official Best Practices**: Follows documented Claude Code patterns
+- **Single Responsibility**: Each agent has one clear purpose
+- **Limited Tool Access**: Agents only access necessary tools
+- **Clean Handoffs**: Clear input/output directory structure
+- **Maintainable**: Version-controlled agent definitions in .claude/
 
 ---
 
-## 💡 **Best Practices Implementation**
+## 💡 **Claude Code Best Practices**
 
-### **Proactive Agent Usage**
+### **Proactive Agent Descriptions**
 
-```python
-# The coordinator proactively uses appropriate agents
-if task_requires_data_collection():
-    await self.data_collector.collect_corpus()
-    
-if linguistic_analysis_needed():
-    await self.linguistic_analyzer.process_texts()
-    
-if model_training_ready():
-    await self.training_engineer.train_model()
-```
+Each agent includes "Use PROACTIVELY" guidance:
+- **data-collector**: "Use PROACTIVELY when corpus data is needed"
+- **linguistic-analyzer**: "Use PROACTIVELY after data collection"
+- **training-engineer**: "Use PROACTIVELY when processed data is ready"
 
-### **Agent Collaboration**
+### **Single Responsibility Design**
 
-```python
-# Agents work together seamlessly
-collection_results = await data_collector.collect()
-analysis_results = await linguistic_analyzer.analyze(collection_results)  
-training_results = await training_engineer.train(analysis_results)
-evaluation_results = await evaluation_specialist.evaluate(training_results)
-```
+Each agent has one clear purpose:
+- **data-collector**: Only collects corpus data
+- **linguistic-analyzer**: Only processes morphology
+- **training-engineer**: Only executes training
 
 ### **Quality Assurance**
 
@@ -349,30 +305,33 @@ Each agent includes built-in quality checks:
 
 ---
 
-## 🚀 **Getting Started Now**
+## 🚀 **Getting Started with Claude Code Agents**
 
-### **Quick Start (5 Minutes)**
+### **Quick Start (Using Task Tool)**
 
-```bash
-# 1. Clone and setup
-git clone https://github.com/Yosef-Ali/amharic-hnet-v2.git
-cd amharic-hnet-v2
-./setup_environment.sh
+```python
+# 1. Collect sample data
+Task(
+    description="Quick data collection",
+    prompt="data-collector: Collect 100 Wikipedia articles for testing",
+    subagent_type="general-purpose"
+)
 
-# 2. Collect sample data
-python workflow_coordinator.py --phase collect --source wikipedia --max-articles 100
-
-# 3. Start training
-python workflow_coordinator.py --phase train --config configs/config.yaml
+# 2. Process collected data
+Task(
+    description="Quick analysis",
+    prompt="linguistic-analyzer: Process sample data for morphological analysis",
+    subagent_type="general-purpose"
+)
 ```
 
-### **Production Deployment (30 Minutes)**
+### **Production Workflow**
 
-```bash
-# Full pipeline
-python workflow_coordinator.py --phase full --source wikipedia --max-articles 1000
+```python
+# Full agent chain for production deployment
+# See agent_workflow_examples.md for complete implementation
 ```
 
-This sub-agent workflow implementation provides **immediate actionable results** while following Claude Code best practices with specialized domain experts. Each agent delivers concrete value and can be used independently or as part of the coordinated workflow.
+This Claude Code native implementation eliminates infrastructure complexity while following official best practices. Each agent has single responsibility, limited tool access, and clear success criteria.
 
-**🇪🇹 Ready to revolutionize Amharic NLP with intelligent sub-agent coordination!**
+**🇪🇹 Ready for efficient Amharic NLP development with Claude Code agents!**

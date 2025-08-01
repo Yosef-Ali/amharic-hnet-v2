@@ -1,0 +1,285 @@
+{
+  "metadata": {
+    "description": "High-quality morpheme-annotated Amharic dataset for H-Net training",
+    "language": "Amharic",
+    "script": "Ge'ez",
+    "total_examples": 16,
+    "annotation_type": "morpheme_boundaries"
+  },
+  "examples": [
+    {
+      "word": "ይፈልጋሉ",
+      "morphemes": [
+        "ይ",
+        "ፈልግ",
+        "አል",
+        "ው"
+      ],
+      "meanings": [
+        "3rd.MASC",
+        "want",
+        "AUX",
+        "3rd.PL"
+      ],
+      "gloss": "they want",
+      "boundaries": [
+        0,
+        3,
+        12,
+        15
+      ]
+    },
+    {
+      "word": "አልመጣችም",
+      "morphemes": [
+        "አል",
+        "መጣ",
+        "ች",
+        "ም"
+      ],
+      "meanings": [
+        "NEG",
+        "come",
+        "3rd.FEM.SG",
+        "NEG"
+      ],
+      "gloss": "she did not come",
+      "boundaries": [
+        0,
+        6,
+        12,
+        15
+      ]
+    },
+    {
+      "word": "ሰማሁ",
+      "morphemes": [
+        "ሰማ",
+        "ሁ"
+      ],
+      "meanings": [
+        "hear",
+        "1st.SG"
+      ],
+      "gloss": "I heard",
+      "boundaries": [
+        0,
+        9
+      ]
+    },
+    {
+      "word": "ትሄዳለች",
+      "morphemes": [
+        "ት",
+        "ሄድ",
+        "አለ",
+        "ች"
+      ],
+      "meanings": [
+        "2nd",
+        "go",
+        "AUX",
+        "FEM"
+      ],
+      "gloss": "she goes",
+      "boundaries": [
+        0,
+        3,
+        9,
+        15
+      ]
+    },
+    {
+      "word": "አይሰሩም",
+      "morphemes": [
+        "አይ",
+        "ሰር",
+        "ው",
+        "ም"
+      ],
+      "meanings": [
+        "NEG",
+        "work",
+        "3rd.MASC",
+        "NEG"
+      ],
+      "gloss": "he does not work",
+      "boundaries": [
+        0,
+        6,
+        12,
+        15
+      ]
+    },
+    {
+      "word": "በቤታችን",
+      "morphemes": [
+        "በ",
+        "ቤት",
+        "አችን"
+      ],
+      "meanings": [
+        "PREP",
+        "house",
+        "1st.PL.POSS"
+      ],
+      "gloss": "in our house",
+      "boundaries": [
+        0,
+        3,
+        9
+      ]
+    },
+    {
+      "word": "ተማሪዎች",
+      "morphemes": [
+        "ተማሪ",
+        "ዎች"
+      ],
+      "meanings": [
+        "student",
+        "PL"
+      ],
+      "gloss": "students",
+      "boundaries": [
+        0,
+        12
+      ]
+    },
+    {
+      "word": "መጽሐፍቱ",
+      "morphemes": [
+        "መጽሐፍ",
+        "ቱ"
+      ],
+      "meanings": [
+        "book",
+        "DEF"
+      ],
+      "gloss": "the book",
+      "boundaries": [
+        0,
+        15
+      ]
+    },
+    {
+      "word": "ልጆቻችን",
+      "morphemes": [
+        "ልጆች",
+        "አችን"
+      ],
+      "meanings": [
+        "children",
+        "1st.PL.POSS"
+      ],
+      "gloss": "our children",
+      "boundaries": [
+        0,
+        12
+      ]
+    },
+    {
+      "word": "ኢትዮጵያዊ",
+      "morphemes": [
+        "ኢትዮጵያ",
+        "ዊ"
+      ],
+      "meanings": [
+        "Ethiopia",
+        "ADJ"
+      ],
+      "gloss": "Ethiopian",
+      "boundaries": [
+        0,
+        15
+      ]
+    },
+    {
+      "word": "እንዴት",
+      "morphemes": [
+        "እንዴት"
+      ],
+      "meanings": [
+        "how"
+      ],
+      "gloss": "how",
+      "boundaries": [
+        0
+      ]
+    },
+    {
+      "word": "ልመጣ",
+      "morphemes": [
+        "ል",
+        "መጣ"
+      ],
+      "meanings": [
+        "1st.SG",
+        "come"
+      ],
+      "gloss": "I will come",
+      "boundaries": [
+        0,
+        3
+      ]
+    },
+    {
+      "word": "አላውቅም",
+      "morphemes": [
+        "አል",
+        "አውቅ",
+        "ም"
+      ],
+      "meanings": [
+        "NEG",
+        "know",
+        "NEG"
+      ],
+      "gloss": "I don't know",
+      "boundaries": [
+        0,
+        6,
+        15
+      ]
+    },
+    {
+      "word": "መንግስት",
+      "morphemes": [
+        "መንግስት"
+      ],
+      "meanings": [
+        "government"
+      ],
+      "gloss": "government",
+      "boundaries": [
+        0
+      ]
+    },
+    {
+      "word": "ዩኒቨርሲቲ",
+      "morphemes": [
+        "ዩኒቨርሲቲ"
+      ],
+      "meanings": [
+        "university"
+      ],
+      "gloss": "university",
+      "boundaries": [
+        0
+      ]
+    },
+    {
+      "word": "አስተማሪ",
+      "morphemes": [
+        "አስተማሪ"
+      ],
+      "meanings": [
+        "teacher"
+      ],
+      "gloss": "teacher",
+      "boundaries": [
+        0
+      ]
+    }
+  ]
+}

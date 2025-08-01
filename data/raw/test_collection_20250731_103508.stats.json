@@ -1,0 +1,16 @@
+{
+  "total_samples": 2,
+  "total_words": 704,
+  "average_quality_score": 0.7725238095238095,
+  "average_amharic_ratio": 1.032627413358916,
+  "sources": {
+    "wikipedia": 2
+  },
+  "cultural_domains": {
+    "history": 2
+  },
+  "dialect_coverage": {
+    "eritrean": 1,
+    "wollo": 2
+  }
+}

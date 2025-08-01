@@ -1,0 +1,34 @@
+
+🇪🇹 AMHARIC CORPUS CULTURAL SAFETY & QUALITY VALIDATION REPORT
+Generated: 2025-07-31 21:32:05
+
+📊 OVERALL RESULTS:
+   • Total Articles Validated: 50
+   • Passed Validation: 9 (18.0%)
+   • Failed Validation: 41 (82.0%)
+   
+   • Overall Quality Score: 0.618/1.000
+   • Cultural Safety Score: 0.956/1.000
+   • Linguistic Quality Score: 0.804/1.000
+
+🔍 VALIDATION CRITERIA:
+   • Minimum Overall Score: 0.600
+   • Minimum Cultural Authenticity: 0.400
+   • Minimum Cultural Safety: 0.700
+   • Minimum Linguistic Quality: 0.600
+   • Minimum Amharic Character Ratio: 70%
+
+⚠️  ISSUES SUMMARY:
+   • insufficient_ethiopian_context: 11 articles (22.0%)
+   • ethnic_tension: ብሔር: 4 articles (8.0%)
+   • ethnic_tension: ዘር: 2 articles (4.0%)
+   • political_conflict: ጦርነት: 2 articles (4.0%)
+   • insufficient_amharic_punctuation: 2 articles (4.0%)
+   • political_conflict: ጥቃት, ጦርነት: 1 articles (2.0%)
+   • ethnic_tension: ዘር, ብሔር: 1 articles (2.0%)
+   • political_conflict: ብጥብጥ: 1 articles (2.0%)
+
+💡 RECOMMENDATIONS:
+   • Increase collection of articles with stronger Ethiopian cultural context
+
+✅ VALIDATION STATUS: NEEDS IMPROVEMENT

@@ -1,0 +1,24 @@
+{
+  "test_timestamp": "2025-07-31T10:35:08.865425",
+  "collection_stats": {
+    "total_collected": 2,
+    "culturally_safe": 2,
+    "total_violations": 0,
+    "total_words": 704,
+    "avg_quality_score": 0.7725238095238095,
+    "avg_amharic_ratio": 1.032627413358916
+  },
+  "cultural_violations": [],
+  "domain_distribution": {
+    "history": 2
+  },
+  "dialect_coverage": {
+    "eritrean": 1,
+    "wollo": 2
+  },
+  "sample_titles": [
+    "የወላሽማ ስርወ መንግስት",
+    "ኩሻራ"
+  ],
+  "test_status": "PARTIAL"
+}

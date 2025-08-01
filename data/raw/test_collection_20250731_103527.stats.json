@@ -1,0 +1,17 @@
+{
+  "total_samples": 5,
+  "total_words": 846,
+  "average_quality_score": 0.786559595959596,
+  "average_amharic_ratio": 1.0439291607759877,
+  "sources": {
+    "wikipedia": 5
+  },
+  "cultural_domains": {
+    "general": 4,
+    "religion": 1
+  },
+  "dialect_coverage": {
+    "wollo": 2,
+    "standard": 3
+  }
+}

@@ -214,8 +214,8 @@ class AmharicDataCollector:
                 params = {
                     'action': 'query',
                     'prop': 'extracts',
-                    'exintro': False,
-                    'explaintext': True,
+                    'exintro': '',
+                    'explaintext': '1',
                     'titles': title,
                     'format': 'json'
                 }

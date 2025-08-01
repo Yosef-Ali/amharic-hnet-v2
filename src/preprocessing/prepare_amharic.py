@@ -255,7 +255,7 @@ class AmharicPreprocessor:
     
     def decode_byte_sequence(self, byte_sequence: List[int]) -> str:
         """
-        Convert byte sequence back to text.
+        Convert byte sequence back to text with robust UTF-8 handling.
         
         Args:
             byte_sequence: List of byte values
@@ -264,10 +264,41 @@ class AmharicPreprocessor:
             Decoded text string
         """
         try:
-            # Remove padding zeros
-            byte_sequence = [b for b in byte_sequence if b != 0]
-            # Convert to bytes and decode
-            return bytes(byte_sequence).decode('utf-8', errors='ignore')
+            # Remove padding zeros and invalid byte values
+            clean_bytes = []
+            for b in byte_sequence:
+                if isinstance(b, (int, float)) and 0 < b < 256:
+                    clean_bytes.append(int(b))
+                elif b == 0:
+                    # Stop at padding/null bytes
+                    break
+            
+            if not clean_bytes:
+                return ""
+            
+            # Convert to bytes and decode with error handling
+            byte_data = bytes(clean_bytes)
+            
+            # Try UTF-8 decoding with different error strategies
+            try:
+                # First try strict UTF-8
+                text = byte_data.decode('utf-8')
+            except UnicodeDecodeError:
+                # Fall back to error replacement
+                text = byte_data.decode('utf-8', errors='replace')
+                # Remove replacement characters
+                text = text.replace('\ufffd', '')
+            
+            # Clean up any remaining control characters except common ones
+            cleaned_text = ""
+            for char in text:
+                char_code = ord(char)
+                # Keep normal characters, Amharic script, whitespace, and basic punctuation
+                if (char_code >= 32 or char in '\n\t\r') and char_code < 127 or (0x1200 <= char_code <= 0x137F) or (0x1380 <= char_code <= 0x139F):
+                    cleaned_text += char
+            
+            return cleaned_text.strip()
+            
         except Exception as e:
             self.logger.warning(f"Error decoding byte sequence: {e}")
             return ""
