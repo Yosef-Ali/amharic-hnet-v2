@@ -1,0 +1,245 @@
+# 300M Parameter Amharic H-Net Configuration
+# Optimized for M2 8GB hardware with transfer learning support
+
+# Model Architecture - 300M Parameters
+model:
+  # Core dimensions for 300M model
+  d_model: 1536                     # Large hidden dimension (vs 768 in compact)
+  n_heads: 24                       # More attention heads (vs 12 in compact)  
+  n_backbone_layers: 24             # Deep hierarchical backbone (vs 6 in compact)
+  n_chunk_layers: 8                 # Dedicated chunk processing layers
+  n_dechunk_layers: 4               # DeChunk processing layers
+  
+  # H-Net specific parameters
+  max_chunks: 256                   # Increased chunk capacity (vs 128 in compact)
+  chunk_size: 128                   # Larger chunk size (vs 64 in compact)
+  vocab_size: 256                   # Byte-level vocabulary
+  max_seq_length: 512               # Sequence length (reduced for memory)
+  
+  # Regularization for large model
+  dropout: 0.1                      # Standard dropout
+  layer_drop_prob: 0.1              # Layer dropout for deep model
+  attention_dropout: 0.1            # Attention dropout
+  
+  # Architecture optimizations
+  use_gradient_checkpointing: true  # Essential for M2 8GB
+  use_flash_attention: false        # Not available on M2
+  memory_efficient_attention: true  # Use memory efficient attention
+  use_fused_ops: true              # Fused operations when available
+
+# Training Configuration - M2 8GB Optimized
+training:
+  # Batch configuration for memory constraints
+  batch_size: 1                     # Very small batch for M2 8GB
+  gradient_accumulation_steps: 8    # Effective batch size = 8
+  max_grad_norm: 1.0               # Gradient clipping
+  
+  # Training schedule
+  num_epochs: 50                    # Extended training for large model
+  learning_rate: 0.00002           # Conservative LR for 300M model (2e-5)
+  warmup_steps: 1000               # Learning rate warmup
+  
+  # Memory management
+  empty_cache_every: 50            # Clear cache every N steps
+  max_memory_usage: 0.85           # Maximum memory usage (85%)
+  pin_memory: false                # Disable for M2 stability
+  
+  # Optimization
+  weight_decay: 0.01               # Weight decay
+  use_mixed_precision: true        # fp16 for memory efficiency
+  optimizer_type: "adamw"          # AdamW optimizer
+  beta1: 0.9                       # Adam beta1
+  beta2: 0.95                      # Adam beta2 (stable for large models)
+  eps: 1e-8                        # Adam epsilon
+  
+  # Monitoring and checkpointing
+  log_interval: 10                 # Log every N steps
+  save_interval: 500               # Save checkpoint every N steps
+  eval_interval: 100               # Evaluate every N steps
+
+# Transfer Learning Configuration
+transfer_learning:
+  enabled: true                     # Enable transfer learning
+  chinese_weights_path: null        # Path to Chinese H-Net weights (if available)
+  progressive_unfreezing: true      # Gradually unfreeze layers
+  freeze_epochs: 5                  # Epochs to keep layers frozen
+  
+  # Layer freezing strategy
+  freeze_embedding: false           # Don't freeze embedding (different vocab)
+  freeze_chunking: true            # Initially freeze chunking layers
+  freeze_backbone_layers: 6        # Number of backbone layers to freeze initially
+  
+  # Fine-tuning parameters
+  finetune_learning_rate: 0.00001  # Lower LR for fine-tuning (1e-5)
+  finetune_warmup_steps: 500       # Shorter warmup for fine-tuning
+
+# Data Configuration
+data:
+  # Text processing
+  max_length: 512                   # Maximum sequence length (reduced for memory)
+  min_length: 20                    # Minimum text length
+  min_amharic_ratio: 0.3           # Minimum Amharic character ratio
+  
+  # Data loading optimization
+  num_workers: 0                    # Single worker for M2 stability
+  prefetch_factor: 1               # Reduced prefetch for memory
+  cache_size: 1000                 # Dataset cache size
+  
+  # Data splits
+  train_split: 0.9                 # Training data ratio
+  val_split: 0.1                   # Validation data ratio
+
+# Hardware Optimization - M2 8GB Specific
+hardware:
+  # Device configuration
+  device: "mps"                     # Use Metal Performance Shaders on M2
+  fallback_device: "cpu"           # Fallback to CPU if MPS unavailable
+  
+  # Memory management
+  memory_limit_gb: 6.0             # Conservative memory limit for M2 8GB
+  garbage_collect_interval: 100    # Run GC every N steps
+  clear_cuda_cache: false          # Not applicable for M2
+  
+  # Performance settings
+  benchmark_mode: false            # Disable for memory consistency
+  deterministic_algorithms: false  # Disable for performance
+  allow_tf32: false                # Not applicable for M2
+
+# Model Scaling Configuration
+scaling:
+  # Parameter counts (approximate)
+  target_parameters: 300_000_000   # Target 300M parameters
+  embedding_params: 393_216        # 256 * 1536 (vocab * d_model)
+  backbone_params: 280_000_000     # Approximate backbone parameters
+  head_params: 20_000_000          # Approximate head parameters
+  
+  # Memory estimates
+  model_size_fp32_gb: 1.2          # ~300M * 4 bytes
+  model_size_fp16_gb: 0.6          # ~300M * 2 bytes
+  activation_memory_gb: 2.0        # Estimated activation memory
+  optimizer_memory_gb: 2.4        # AdamW needs 2x model size
+  total_memory_estimate_gb: 5.0    # Conservative total estimate
+
+# Generation Configuration
+generation:
+  # Generation parameters
+  max_generation_length: 100       # Maximum generation length
+  temperature: 0.8                 # Sampling temperature
+  top_k: 50                        # Top-k sampling
+  top_p: 0.9                       # Top-p (nucleus) sampling
+  
+  # Quality settings
+  repetition_penalty: 1.1          # Repetition penalty
+  length_penalty: 1.0              # Length penalty
+  early_stopping: true             # Enable early stopping
+  
+  # Memory management during generation
+  max_batch_size: 1                # Single sample generation
+  use_cache: false                 # Disable KV cache for memory
+
+# Evaluation Configuration
+evaluation:
+  # Evaluation metrics
+  compute_perplexity: true         # Compute perplexity
+  evaluate_generation: true        # Evaluate generation quality
+  cultural_safety_check: true      # Check cultural safety
+  
+  # Test prompts for evaluation
+  test_prompts:
+    - "ይፈልጋሉ"     # "they want"
+    - "አማርኛ"       # "Amharic" 
+    - "ኢትዮጵያ"      # "Ethiopia"
+    - "ቡና"         # "coffee"
+    - "ሰላም"        # "peace"
+    - "ትምህርት"      # "education"
+    - "ባህል"        # "culture"
+    - "ሀገር"        # "country"
+
+# Logging and Monitoring
+logging:
+  # Log levels and output
+  log_level: "INFO"                # Logging level
+  log_file: "training_300m.log"    # Log file name
+  
+  # Tensorboard logging
+  use_tensorboard: true            # Enable tensorboard
+  tensorboard_dir: "logs/300m"     # Tensorboard directory
+  
+  # Weights & Biases (optional)
+  use_wandb: false                 # Enable W&B logging
+  wandb_project: "amharic-hnet-300m" # W&B project name
+  
+  # Memory and performance logging
+  log_memory_usage: true           # Log memory usage
+  log_model_stats: true            # Log model statistics
+  log_generation_samples: true     # Log generation samples
+
+# Cultural Safety Configuration
+cultural_safety:
+  # Safety checking during training
+  enable_runtime_checking: true    # Enable during training
+  violation_threshold: 0.05        # Lower threshold for large model
+  
+  # Protected terms and concepts
+  protect_sacred_terms: true       # Protect religious/sacred terms
+  protect_historical_figures: true # Protect historical references
+  
+  # Content filtering
+  filter_inappropriate: true      # Filter inappropriate content
+  cultural_context_aware: true    # Use cultural context
+
+# Paths and Directories
+paths:
+  # Data paths
+  data_dir: "data/processed"       # Processed data directory
+  raw_data_dir: "data/raw"        # Raw data directory
+  
+  # Model paths  
+  output_dir: "outputs/300m"      # Output directory for 300M model
+  checkpoint_dir: "checkpoints/300m" # Checkpoint directory
+  
+  # Transfer learning paths
+  chinese_hnet_path: null         # Path to Chinese H-Net weights
+  pretrained_embeddings: null     # Path to pretrained embeddings
+  
+  # Evaluation paths
+  eval_output_dir: "evaluation_results/300m" # Evaluation results
+
+# Advanced Configuration
+advanced:
+  # Experimental features
+  use_dynamic_batching: false     # Dynamic batching (experimental)
+  adaptive_chunk_size: false      # Adaptive chunk sizing (experimental)
+  
+  # Debugging and profiling
+  debug_mode: false               # Debug mode
+  profile_training: false         # Profile training performance
+  memory_profiling: false         # Profile memory usage
+  
+  # Model architecture experiments
+  use_rotary_embeddings: false    # Rotary position embeddings
+  use_alibi_attention: false      # ALiBi attention bias
+  use_layer_scale: true           # Layer scaling for deep models
+
+# Reproducibility
+reproducibility:
+  seed: 42                        # Random seed
+  deterministic: false            # Deterministic algorithms (slower)
+  benchmark: false                # PyTorch benchmark mode
+
+# Success Criteria and Targets
+targets:
+  # Performance targets
+  target_perplexity: 15.0         # Target validation perplexity
+  target_generation_quality: 0.8  # Target generation quality score
+  
+  # Memory targets
+  max_training_memory_gb: 6.0     # Maximum training memory usage
+  max_inference_memory_gb: 2.0    # Maximum inference memory usage
+  
+  # Training targets
+  convergence_patience: 10        # Patience for convergence
+  min_improvement: 0.01           # Minimum improvement threshold
+  
+  # Cultural safety targets
+  cultural_safety_score: 0.95     # Target cultural safety compliance

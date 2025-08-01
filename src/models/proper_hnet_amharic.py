@@ -307,7 +307,7 @@ class AmharicHNetMixer(nn.Module):
         
         # Input embedding
         self.input_embedding = nn.Embedding(vocab_size, d_model)
-        self.pos_encoding = self._create_positional_encoding(5000, d_model)
+        self.pos_encoding = nn.Parameter(self._create_positional_encoding(5000, d_model), requires_grad=False)
         
         # Core H-Net components (following exact original architecture)
         self.dynamic_chunker = DynamicChunker(d_model)
