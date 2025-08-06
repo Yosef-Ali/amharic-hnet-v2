@@ -268,7 +268,7 @@ def cmd_test(args):
         
         # Test model initialization
         print("✓ Testing model initialization...")
-        model = AmharicHNet(d_model=256, n_main_layers=2)
+        model = AmharicHNet(d_model=256, n_main_layers=2, n_heads=8)
         print(f"  Model parameters: {sum(p.numel() for p in model.parameters()):,}")
         
         # Test preprocessor

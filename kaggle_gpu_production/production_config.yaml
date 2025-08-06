@@ -1,0 +1,115 @@
+cultural_safety:
+  bias_detection: true
+  cultural_context_scoring: true
+  enable_runtime_checking: true
+  human_review_flagging: true
+  protect_sacred_terms: true
+  violation_threshold: 0.02
+data:
+  cultural_filtering: true
+  data_augmentation: true
+  dialect_normalization: true
+  max_length: 512
+  min_amharic_ratio: 0.7
+  min_length: 10
+  morpheme_segmentation: true
+  prefetch_factor: 4
+  shuffle_buffer: 50000
+  test_split: 0.05
+  train_split: 0.85
+  val_split: 0.1
+hardware:
+  compile_model: true
+  device: cuda
+  empty_cache_every: 50
+  gpu_memory_fraction: 0.95
+  gradient_checkpointing: true
+  memory_profiling: true
+  mixed_precision: fp16
+  pin_memory: true
+  profile_gpu_usage: true
+kaggle:
+  ablation_study_tracking: true
+  benchmark_against_baselines: true
+  ensemble_performance_tracking: true
+  inference_speed_target: 10
+  medal_target: gold
+  memory_limit: 16GB
+  submission_format: pytorch
+  target_percentile: 85.0
+mle_star:
+  discovery:
+    enable_advanced_filtering: true
+    max_results: 20
+    search_queries:
+    - amharic transformer large model
+    - ethiopian nlp state-of-the-art
+    - semitic language hierarchical processing
+    - low-resource language modeling 2024
+    - cultural safety multilingual models
+  ensemble:
+    cultural_safety_threshold: 0.98
+    max_candidates: 10
+    meta_learner_training: true
+    optimization_methods:
+    - gradient
+    - evolutionary
+    - bayesian
+  refinement:
+    components_to_optimize:
+    - chunking
+    - attention
+    - embedding
+    - backbone
+    - cultural_safety
+    convergence_threshold: 0.001
+    max_cycles: 5
+    max_iterations: 10
+    parallel_variations: 5
+model:
+  amharic_morpheme_aware: true
+  attention_dropout: 0.1
+  chunk_size: 128
+  compression_ratio: 4.5
+  cultural_safety_integration: true
+  d_model: 512
+  dropout: 0.1
+  layer_drop_prob: 0.05
+  max_chunks: 256
+  max_seq_length: 512
+  memory_efficient_attention: true
+  multi_dialect_support: true
+  n_backbone_layers: 24
+  n_chunk_layers: 8
+  n_dechunk_layers: 4
+  n_decoder_layers: 6
+  n_encoder_layers: 6
+  n_heads: 16
+  n_main_layers: 12
+  use_flash_attention: true
+  use_gradient_checkpointing: true
+  use_mixed_precision: true
+  vocab_size: 256
+training:
+  ablation_studies: true
+  automated_hyperparameter_tuning: true
+  batch_size: 32
+  distributed_training: false
+  early_stopping_patience: 5
+  ensemble_training: true
+  eta_min: 1.0e-06
+  eval_every: 1
+  gradient_accumulation_steps: 4
+  learning_rate: 0.0002
+  log_interval: 100
+  lr_scheduler: cosine
+  max_grad_norm: 1.0
+  num_epochs: 20
+  num_workers: 8
+  optimizer: adamw
+  pin_memory: true
+  save_every: 2
+  use_mle_star_refinement: true
+  use_wandb: true
+  warmup_steps: 2000
+  weight_decay: 0.01

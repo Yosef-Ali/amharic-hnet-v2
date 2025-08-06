@@ -172,6 +172,23 @@ paths:
   # Evaluation paths
   eval_output_dir: "evaluation_results" # Evaluation results directory
 
+# MLE-STAR Integration Configuration
+mle_star:
+  discovery:
+    max_results: 10
+    search_queries:
+      - "amharic language model transformer"
+      - "ethiopian nlp hierarchical"
+      - "semitic language processing"
+  
+  refinement:
+    max_iterations: 5
+    convergence_threshold: 0.001
+  
+  ensemble:
+    optimization_methods: ['gradient', 'evolutionary']
+    max_candidates: 5
+
 # Advanced Settings
 advanced:
   # Memory settings

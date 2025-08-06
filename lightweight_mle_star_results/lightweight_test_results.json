@@ -1,0 +1,156 @@
+{
+  "test_metadata": {
+    "timestamp": "2025-08-05 13:39:34",
+    "test_type": "lightweight_mock",
+    "device": "cpu",
+    "config": {
+      "model": {
+        "d_model": 64,
+        "n_encoder_layers": 1,
+        "n_decoder_layers": 1,
+        "n_main_layers": 2,
+        "n_heads": 2,
+        "compression_ratio": 2.0,
+        "vocab_size": 256,
+        "dropout": 0.1,
+        "layer_norm_eps": "1e-5"
+      },
+      "training": {
+        "batch_size": 2,
+        "num_epochs": 1,
+        "learning_rate": "1e-4",
+        "warmup_steps": 10,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "save_every": 1,
+        "eval_every": 1,
+        "log_interval": 10,
+        "num_workers": 1
+      },
+      "mle_star": {
+        "discovery": {
+          "max_results": 3,
+          "search_queries": [
+            "amharic language model"
+          ]
+        },
+        "refinement": {
+          "max_iterations": 1,
+          "convergence_threshold": 0.1
+        },
+        "ensemble": {
+          "optimization_methods": [
+            "gradient"
+          ],
+          "max_candidates": 2
+        }
+      },
+      "paths": {
+        "data_dir": "data/processed",
+        "output_dir": "outputs",
+        "checkpoint_dir": "checkpoints",
+        "eval_output_dir": "evaluation_results"
+      },
+      "reproducibility": {
+        "seed": 42,
+        "deterministic": false
+      },
+      "advanced": {
+        "max_memory_usage": 0.5,
+        "empty_cache_every": 10,
+        "debug_mode": false,
+        "profile_training": false
+      }
+    }
+  },
+  "baseline_results": {
+    "model_parameters": 100096,
+    "performance_score": 0.5300288,
+    "cultural_safety_score": 0.95,
+    "architecture_type": "simplified_hnet"
+  },
+  "discovery_results": {
+    "total_models_found": 2,
+    "high_relevance_models": 2,
+    "recommendations": {
+      "high_priority": [
+        {
+          "model_name": "Mock Amharic Transformer",
+          "relevance_score": 0.85,
+          "reason": "High relevance to Amharic processing"
+        }
+      ],
+      "medium_priority": [],
+      "low_priority": []
+    },
+    "search_effectiveness": 2
+  },
+  "refinement_results": {
+    "ablation_results": [
+      {
+        "component_name": "chunking",
+        "baseline_performance": 0.5300288,
+        "ablated_performance": 0.50352736,
+        "performance_impact": 0.026501439999999987,
+        "statistical_significance": 0.01
+      },
+      {
+        "component_name": "attention",
+        "baseline_performance": 0.5300288,
+        "ablated_performance": 0.50352736,
+        "performance_impact": 0.026501439999999987,
+        "statistical_significance": 0.01
+      }
+    ],
+    "refinement_iterations": 2,
+    "best_performance": 0.5500288,
+    "total_improvement": 0.020000000000000018
+  },
+  "ensemble_results": {
+    "num_candidates": 3,
+    "optimization_methods_tested": 1,
+    "best_ensemble_score": 0.9215961741561763,
+    "optimization_time": 2.0
+  },
+  "evaluation_results": {
+    "traditional_metrics": {
+      "perplexity": 15.2,
+      "compression_ratio": 4.3,
+      "cultural_safety_rate": 0.96,
+      "amharic_quality_score": 0.89,
+      "overall_performance": 0.85
+    },
+    "mle_star_metrics": {
+      "model_discovery_effectiveness": 0.78,
+      "refinement_improvement_rate": 0.82,
+      "ensemble_performance_gain": 0.75,
+      "automated_optimization_score": 0.79
+    },
+    "kaggle_medal_probability": {
+      "bronze_probability": 0.85,
+      "silver_probability": 0.65,
+      "gold_probability": 0.25,
+      "expected_percentile": 78.5
+    },
+    "improvement_analysis": {
+      "automation_benefit": 0.79,
+      "discovery_benefit": 0.78,
+      "refinement_benefit": 0.82,
+      "ensemble_benefit": 0.75
+    },
+    "recommendations": {
+      "optimization_targets": [
+        "Improve model discovery search precision"
+      ],
+      "ensemble_recommendations": [
+        "Consider additional optimization methods"
+      ]
+    }
+  },
+  "test_summary": {
+    "all_phases_completed": true,
+    "total_parameters": 100096,
+    "final_performance": 0.85,
+    "kaggle_expectation": 78.5
+  }
+}

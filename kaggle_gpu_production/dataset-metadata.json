@@ -1,0 +1,27 @@
+{
+  "title": "Amharic H-Net Large Model Training Files",
+  "id": "yosefali2/amharic-hnet-large-training",
+  "licenses": [
+    {
+      "name": "MIT"
+    }
+  ],
+  "resources": [
+    {
+      "path": "claude_gpu_training.py",
+      "description": "GPU-optimized training script with 19M+ parameters"
+    },
+    {
+      "path": "production_config.yaml",
+      "description": "Training configuration file"
+    },
+    {
+      "path": "requirements_production.txt",
+      "description": "Python dependencies for training"
+    },
+    {
+      "path": "kaggle_gpu_simple.py",
+      "description": "Simplified GPU training script"
+    }
+  ]
+}

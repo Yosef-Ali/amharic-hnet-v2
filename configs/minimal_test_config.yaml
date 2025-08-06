@@ -1,0 +1,55 @@
+# Minimal Test Configuration for MLE-STAR Integration
+# Ultra-lightweight settings to avoid memory issues
+
+model:
+  d_model: 64                     # Very small hidden dimension
+  n_encoder_layers: 1             # Minimal encoder layers
+  n_decoder_layers: 1             # Minimal decoder layers
+  n_main_layers: 2                # Minimal main layers
+  n_heads: 2                      # Minimal attention heads
+  compression_ratio: 2.0          # Lower compression ratio
+  vocab_size: 256                 # Byte-level vocabulary
+  dropout: 0.1
+  layer_norm_eps: 1e-5
+
+training:
+  batch_size: 2                   # Very small batch size
+  num_epochs: 1                   # Single epoch
+  learning_rate: 1e-4
+  warmup_steps: 10                # Minimal warmup
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  save_every: 1
+  eval_every: 1
+  log_interval: 10
+  num_workers: 1                  # Single worker
+
+mle_star:
+  discovery:
+    max_results: 3                # Minimal results
+    search_queries:
+      - "amharic language model"
+  
+  refinement:
+    max_iterations: 1             # Single iteration
+    convergence_threshold: 0.1
+  
+  ensemble:
+    optimization_methods: ['gradient']
+    max_candidates: 2             # Minimal candidates
+
+paths:
+  data_dir: "data/processed"
+  output_dir: "outputs"
+  checkpoint_dir: "checkpoints"
+  eval_output_dir: "evaluation_results"
+
+reproducibility:
+  seed: 42
+  deterministic: false
+
+advanced:
+  max_memory_usage: 0.5           # Lower memory usage
+  empty_cache_every: 10
+  debug_mode: false
+  profile_training: false

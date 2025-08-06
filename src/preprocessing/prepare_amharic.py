@@ -36,11 +36,11 @@ class AmharicPreprocessor:
         
         # Common Amharic prefixes and suffixes for morpheme awareness
         self.prefixes = [
-            'በ', 'ከ', 'ለ', 'ወ', 'የ', 'እ', 'ም', 'ኣ', 'ት', 'ን', 'ኢ'  # Common prefixes
+            'የ', 'በ', 'ከ', 'ለ', 'ወ', 'እ', 'ም', 'ኣ', 'ት', 'ን', 'ኢ', 'አይ', 'አል', 'yä-', 'yämm-', 'መ', 'iyye-', 'እየ', 'ይ', 'ተ'
         ]
         
         self.suffixes = [
-            'ች', 'ኝ', 'ው', 'ሽ', 'ን', 'ተ', 'ና', 'ም', 'ህ', 'ሁ', 'ሻ'  # Common suffixes
+            'ኦች', 'ዎች', 'ዮች', 'ች', 'ኝ', 'ው', 'ሽ', 'ን', 'ተ', 'ና', 'ም', 'ህ', 'ሁ', 'ሻ', '-očč', '-wočč', '-yočč', '-at', '-an', '-u', '-wa', '-e', '-ye', '-h', '-sh', '-nät', '-ኛ', '-ተኛ', 'ኩ', 'ጣ', 'ል'
         ]
         
         # Cultural terms that should be preserved exactly
@@ -85,7 +85,7 @@ class AmharicPreprocessor:
         
         return text
     
-    def clean_text(self, text: str) -> str:
+    def clean_text(self, text: str, preserve_spaces: bool = False) -> str:
         """
         Clean and normalize Amharic text while preserving cultural context.
         """
@@ -96,7 +96,8 @@ class AmharicPreprocessor:
         text = self.normalize_unicode(text)
         
         # Remove unnecessary whitespace but preserve meaningful spacing
-        text = re.sub(r'\s+', ' ', text.strip())
+        if not preserve_spaces:
+            text = re.sub(r'\s+', ' ', text.strip())
         
         # Handle mixed script text (preserve Latin for numbers, dates, etc.)
         # Keep numbers and basic Latin punctuation
@@ -127,23 +128,35 @@ class AmharicPreprocessor:
         segments = []
         remaining = word
         
-        # Check for prefixes
-        for prefix in sorted(self.prefixes, key=len, reverse=True):
-            if remaining.startswith(prefix) and len(remaining) > len(prefix):
-                segments.append(prefix)
-                remaining = remaining[len(prefix):]
+        # Iteratively check for prefixes
+        while True:
+            found_prefix = False
+            for prefix in sorted(self.prefixes, key=len, reverse=True):
+                if remaining.startswith(prefix) and len(remaining) > len(prefix):
+                    segments.append(prefix)
+                    remaining = remaining[len(prefix):]
+                    found_prefix = True
+                    break
+            if not found_prefix:
                 break
-        
-        # Check for suffixes
-        for suffix in sorted(self.suffixes, key=len, reverse=True):
-            if remaining.endswith(suffix) and len(remaining) > len(suffix):
-                segments.append(remaining[:-len(suffix)])
-                segments.append(suffix)
+
+        # Iteratively check for suffixes
+        temp_segments = []
+        while True:
+            found_suffix = False
+            for suffix in sorted(self.suffixes, key=len, reverse=True):
+                if remaining.endswith(suffix) and len(remaining) > len(suffix):
+                    temp_segments.insert(0, suffix)
+                    remaining = remaining[:-len(suffix)]
+                    found_suffix = True
+                    break
+            if not found_suffix:
                 break
-        else:
-            # No suffix found, add the remaining as root
-            if remaining:
-                segments.append(remaining)
+
+        if remaining:
+            segments.append(remaining)
+
+        segments.extend(temp_segments)
         
         return [seg for seg in segments if seg]  # Remove empty segments
     

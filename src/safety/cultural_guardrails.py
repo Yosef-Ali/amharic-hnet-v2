@@ -43,11 +43,15 @@ class AmharicCulturalGuardrails:
         self.forbidden_associations = {
             "ቡና": [
                 "addictive", "drug", "harmful", "dangerous", "toxic", "poison",
-                "evil", "sin", "forbidden", "illegal", "bad", "negative"
+                "evil", "sin", "forbidden", "illegal", "bad", "negative",
+                "አለመለወጥ", "አደንዛዥ", "ጎጂ", "አደገኛ", "መርዛማ", "መርዝ",
+                "ክፉ", "ኃጢአት", "የተከለከለ", "ሕገወጥ", "መጥፎ", "አሉታዊ"
             ],
             "መስቀል": [
                 "decoration", "fashion", "jewelry", "ornament", "accessory",
-                "style", "trend", "design", "art piece", "craft"
+                "style", "trend", "design", "art piece", "craft",
+                "ምስል", "ጌጥ", "ፋሽን", "ጌጣጌጥ", "ጌጥ", "መለዋወጫ",
+                "ቅጥ", "አዝማሚያ", "ንድፍ", "የሥነ ጥበብ ክፍል", "ዕደ-ጥበብ"
             ],
             "ቀዳማዊ": [
                 "dictator", "tyrant", "oppressor", "brutal", "cruel", "harsh",
@@ -176,22 +180,17 @@ class AmharicCulturalGuardrails:
         
         for sacred_term, description in self.sacred_terms.items():
             if sacred_term in text:
-                # Check if any forbidden associations appear near the sacred term
+                # Check if any forbidden associations appear in the text
                 forbidden_words = self.forbidden_associations.get(sacred_term, [])
                 
                 for forbidden in forbidden_words:
                     if forbidden.lower() in text_lower:
-                        # Check proximity (within 50 characters)
-                        sacred_pos = text.find(sacred_term)
-                        forbidden_pos = text_lower.find(forbidden.lower())
-                        
-                        if abs(sacred_pos - forbidden_pos) <= 50:
-                            violations.append(CulturalViolation(
-                                term=sacred_term,
-                                violation_type="inappropriate_association",
-                                context=f"'{sacred_term}' associated with '{forbidden}'",
-                                severity="high"
-                            ))
+                        violations.append(CulturalViolation(
+                            term=sacred_term,
+                            violation_type="inappropriate_association",
+                            context=f"'{sacred_term}' associated with '{forbidden}'",
+                            severity="high"
+                        ))
         
         return violations
     
